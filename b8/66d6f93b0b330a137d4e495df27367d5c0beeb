@@ -1,0 +1,104 @@
+app/src/main/AndroidManifest.xml
+  s_0f5eaf8946b3f3::t_4b6063253e3055 1-33
+app/src/main/cpp/termux.c
+  s_0f5eaf8946b3f3::t_4740329663edae 1-218
+app/src/main/java/com/xiaoqiao/codeagent/ui/AppViewModel.kt
+  s_0f5eaf8946b3f3::t_57dd5d642b547e 1-25
+app/src/main/java/com/xiaoqiao/codeagent/ui/shell/TerminalScreen.kt
+  s_0f5eaf8946b3f3::t_a2ed2786f7e72a 1-247
+build.gradle.kts
+  s_0f5eaf8946b3f3::t_b2cb310fcaa17a 1-5
+gradle.properties
+  s_0f5eaf8946b3f3::t_77e348cee3a026 1-6
+gradlew
+  s_0f5eaf8946b3f3::t_c0e3480033f8a6 1-13
+terminal-emulator/src/main/AndroidManifest.xml
+  s_0f5eaf8946b3f3::t_6d5947e06eaa8f 1-2
+terminal-emulator/src/main/cpp/termux.c
+  s_0f5eaf8946b3f3::t_ff8464728687b2 1-218
+terminal-emulator/src/main/java/com/termux/terminal/AndroidUtils.java
+  s_0f5eaf8946b3f3::t_4b69495536d4d3 1-65
+terminal-emulator/src/main/java/com/termux/terminal/ByteQueue.java
+  s_0f5eaf8946b3f3::t_aac1ce83ff58e9 1-108
+terminal-emulator/src/main/java/com/termux/terminal/ITermImage.java
+  s_0f5eaf8946b3f3::t_30136a945dd6e3 1-399
+terminal-emulator/src/main/java/com/termux/terminal/JNI.java
+  s_0f5eaf8946b3f3::t_ca0a271f8802d8 1-41
+terminal-emulator/src/main/java/com/termux/terminal/KeyHandler.java
+  s_0f5eaf8946b3f3::t_30afb5b023c5e8 1-373
+terminal-emulator/src/main/java/com/termux/terminal/Logger.java
+  s_0f5eaf8946b3f3::t_9133a469433aa4 1-80
+terminal-emulator/src/main/java/com/termux/terminal/TerminalBuffer.java
+  s_0f5eaf8946b3f3::t_e2258cb4bee165 1-769
+terminal-emulator/src/main/java/com/termux/terminal/TerminalColorScheme.java
+  s_0f5eaf8946b3f3::t_80194fe1471d26 1-126
+terminal-emulator/src/main/java/com/termux/terminal/TerminalColors.java
+  s_0f5eaf8946b3f3::t_4d87f2a0c98da1 1-96
+terminal-emulator/src/main/java/com/termux/terminal/TerminalEmulator.java
+  s_0f5eaf8946b3f3::t_2f6dfd82dbb2ef 1-3569
+terminal-emulator/src/main/java/com/termux/terminal/TerminalOutput.java
+  s_0f5eaf8946b3f3::t_0c73b6d76f47d2 1-32
+terminal-emulator/src/main/java/com/termux/terminal/TerminalRow.java
+  s_0f5eaf8946b3f3::t_3b67c898ff44df 1-290
+terminal-emulator/src/main/java/com/termux/terminal/TerminalSession.java
+  s_0f5eaf8946b3f3::t_b3b5564d0e456d 1-373
+terminal-emulator/src/main/java/com/termux/terminal/TerminalSessionClient.java
+  s_0f5eaf8946b3f3::t_599599eb3a124e 1-51
+terminal-emulator/src/main/java/com/termux/terminal/TerminalSixel.java
+  s_0f5eaf8946b3f3::t_77412539aaee39 1-271
+terminal-emulator/src/main/java/com/termux/terminal/TextStyle.java
+  s_0f5eaf8946b3f3::t_855d412c902542 1-116
+terminal-emulator/src/main/java/com/termux/terminal/WcWidth.java
+  s_0f5eaf8946b3f3::t_2982020e2a3363 1-566
+terminal-emulator/src/main/jni/Android.mk
+  s_0f5eaf8946b3f3::t_2d24fbd06c635a 1-5
+terminal-emulator/src/main/jni/termux.c
+  s_0f5eaf8946b3f3::t_d79224c9befed7 1-218
+terminal-view/src/main/AndroidManifest.xml
+  s_0f5eaf8946b3f3::t_6f7edbc08be72d 1-2
+terminal-view/src/main/java/com/termux/view/GestureAndScaleRecognizer.java
+  s_0f5eaf8946b3f3::t_ded61e4552e474 1-112
+terminal-view/src/main/java/com/termux/view/TerminalRenderer.java
+  s_0f5eaf8946b3f3::t_cd09a045b040de 1-276
+terminal-view/src/main/java/com/termux/view/TerminalView.java
+  s_0f5eaf8946b3f3::t_3285452baa7096 1-1520
+terminal-view/src/main/java/com/termux/view/TerminalViewClient.java
+  s_0f5eaf8946b3f3::t_e0c3748e9243e1 1-83
+terminal-view/src/main/java/com/termux/view/support/PopupWindowCompatGingerbread.java
+  s_0f5eaf8946b3f3::t_0ee0427b0ec4cc 1-75
+terminal-view/src/main/java/com/termux/view/textselection/CursorController.java
+  s_0f5eaf8946b3f3::t_d4136dccc20dce 1-55
+terminal-view/src/main/java/com/termux/view/textselection/TextSelectionCursorController.java
+  s_0f5eaf8946b3f3::t_f7760b5cc55cf1 1-407
+terminal-view/src/main/java/com/termux/view/textselection/TextSelectionHandleView.java
+  s_0f5eaf8946b3f3::t_23899ba20cf317 1-352
+terminal-view/src/main/res/drawable/text_select_handle_left_material.xml
+  s_0f5eaf8946b3f3::t_bcac04eb08c3fe 1-10
+terminal-view/src/main/res/drawable/text_select_handle_right_material.xml
+  s_0f5eaf8946b3f3::t_c6a79eb5e47e2d 1-10
+terminal-view/src/main/res/values/strings.xml
+  s_0f5eaf8946b3f3::t_aef44e8f26d81a 1-5
+third_party/TERMUX_TERMINAL_LICENSE.txt
+  s_0f5eaf8946b3f3::t_dae18e740e926f 1-3
+tools/build_jni.sh
+  s_0f5eaf8946b3f3::t_2138422d7073d1 1-18
+tools/fetch_native.py
+  s_0f5eaf8946b3f3::t_571fd41429a648 1-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b866d6f93b0b330a137d4e495df27367d5c0beeb",
+  "prompts": {},
+  "logical_commit_id": "b866d6f93b0b330a137d4e495df27367d5c0beeb",
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "auto-smart"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>"
+    }
+  }
+}
