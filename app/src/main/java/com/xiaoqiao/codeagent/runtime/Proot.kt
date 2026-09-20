@@ -18,6 +18,7 @@ object Proot {
         cmd: List<String>,
         cwd: String = "/root",
         extraBinds: List<Pair<String, String>> = emptyList(),
+        wrapUserShell: Boolean = false,
     ): Command {
         val boot = Bootstrap.bootDir(ctx)
         val debian = Bootstrap.debianDir(ctx)
@@ -55,11 +56,12 @@ object Proot {
             "USER=root",
             "TERM=xterm-256color",
             "LANG=C.UTF-8",
-            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            // cursor-agent (and similar CLIs) install into ~/.local/bin via bashrc.
+            "PATH=/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
             "TMPDIR=/tmp",
             "PREFIX=/usr",
         )
-        argv += cmd
+        argv += if (wrapUserShell) wrapWithUserShell(cmd) else cmd
 
         val env = mapOf(
             "PROOT_LOADER" to loader,
@@ -69,8 +71,13 @@ object Proot {
         return Command(argv = argv, env = env, workingDir = boot)
     }
 
-    fun processBuilder(ctx: Context, cmd: List<String>, cwd: String = "/root"): ProcessBuilder {
-        val c = command(ctx, cmd, cwd)
+    fun processBuilder(
+        ctx: Context,
+        cmd: List<String>,
+        cwd: String = "/root",
+        wrapUserShell: Boolean = false,
+    ): ProcessBuilder {
+        val c = command(ctx, cmd, cwd, wrapUserShell = wrapUserShell)
         return ProcessBuilder(c.argv)
             .directory(c.workingDir)
             .apply {
@@ -80,5 +87,20 @@ object Proot {
                 environment()["PATH"] = "/system/bin:/system/xbin"
             }
             .redirectErrorStream(true)
+    }
+
+    /**
+     * Source the guest login files, then exec [cmd].
+     * `~/.bashrc` often has an interactive-only early return, so PATH is also
+     * re-prepended afterwards (cursor-agent lives in ~/.local/bin).
+     */
+    private fun wrapWithUserShell(cmd: List<String>): List<String> {
+        val script = """
+            [ -f "${'$'}HOME/.profile" ] && . "${'$'}HOME/.profile" || true
+            [ -f "${'$'}HOME/.bashrc" ] && . "${'$'}HOME/.bashrc" || true
+            export PATH="${'$'}HOME/.local/bin:${'$'}PATH"
+            exec "${'$'}@"
+        """.trimIndent()
+        return listOf("/bin/bash", "-c", script, "agent") + cmd
     }
 }

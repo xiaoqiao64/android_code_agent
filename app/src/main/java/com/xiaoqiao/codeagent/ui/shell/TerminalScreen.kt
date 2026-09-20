@@ -1,22 +1,28 @@
 package com.xiaoqiao.codeagent.ui.shell
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
-import androidx.activity.ComponentActivity
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -31,12 +37,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import kotlinx.coroutines.delay
 import com.xiaoqiao.codeagent.runtime.Bootstrap
 import com.xiaoqiao.codeagent.runtime.Proot
 import com.termux.terminal.TerminalSession
@@ -47,26 +58,28 @@ import com.termux.view.TerminalViewClient
 private const val TAG = "TerminalScreen"
 private const val FONT_SIZE_SP = 18
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun TerminalScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val holder = remember { TerminalHolder(context) }
+    val imeVisible = WindowInsets.isImeVisible
+    var imeWasVisible by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
-        val window = (context as? ComponentActivity)?.window
-        val previousMode = window?.attributes?.softInputMode
-        window?.setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE or
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE,
-        )
         holder.start()
         holder.requestKeyboard()
-        onDispose {
-            if (previousMode != null) {
-                window?.setSoftInputMode(previousMode)
-            }
-            holder.destroy()
+        onDispose { holder.destroy() }
+    }
+
+    LaunchedEffect(imeVisible) {
+        if (imeVisible) {
+            imeWasVisible = true
+        } else if (imeWasVisible) {
+            delay(250)
+            // User dismissed the IME: drop focus so a layout/resize does not pull it back.
+            holder.releaseFocus()
+            imeWasVisible = false
         }
     }
 
@@ -106,6 +119,7 @@ fun TerminalScreen(onBack: () -> Unit) {
                 ExtraKey("ESC") { holder.write("\u001b") }
                 ExtraKey("CTRL") { holder.toggleCtrl() }
                 ExtraKey("TAB") { holder.write("\t") }
+                ExtraKey("PASTE") { holder.pasteClipboard() }
                 ExtraKey("↑") { holder.write("\u001b[A") }
                 ExtraKey("↓") { holder.write("\u001b[B") }
                 ExtraKey("←") { holder.write("\u001b[D") }
@@ -126,6 +140,7 @@ private class TerminalHolder(private val context: Context) {
     private var session: TerminalSession? = null
     private var view: TerminalView? = null
     private var ctrlDown = false
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     fun createView(): TerminalView {
         val fontPx = TypedValue.applyDimension(
@@ -163,9 +178,7 @@ private class TerminalHolder(private val context: Context) {
             override fun readShiftKey(): Boolean = false
             override fun readFnKey(): Boolean = false
             override fun onCodePoint(codePoint: Int, ctrlDown: Boolean, session: TerminalSession): Boolean = false
-            override fun onEmulatorSet() {
-                requestKeyboard()
-            }
+            override fun onEmulatorSet() {}
             override fun logError(tag: String?, message: String?) { Log.e(tag ?: TAG, message ?: "") }
             override fun logWarn(tag: String?, message: String?) { Log.w(tag ?: TAG, message ?: "") }
             override fun logInfo(tag: String?, message: String?) { Log.i(tag ?: TAG, message ?: "") }
@@ -196,8 +209,12 @@ private class TerminalHolder(private val context: Context) {
                 }
                 override fun onTitleChanged(changedSession: TerminalSession) {}
                 override fun onSessionFinished(finishedSession: TerminalSession) {}
-                override fun onCopyTextToClipboard(session: TerminalSession, text: String?) {}
-                override fun onPasteTextFromClipboard(session: TerminalSession?) {}
+                override fun onCopyTextToClipboard(session: TerminalSession, text: String?) {
+                    copyToClipboard(text)
+                }
+                override fun onPasteTextFromClipboard(session: TerminalSession?) {
+                    pasteClipboard()
+                }
                 override fun onBell(session: TerminalSession) {}
                 override fun onColorsChanged(session: TerminalSession) {}
                 override fun onTerminalCursorStateChange(state: Boolean) {}
@@ -216,7 +233,6 @@ private class TerminalHolder(private val context: Context) {
             val sess = TerminalSession(shellPath, cmd.workingDir.absolutePath, args, env, 2000, client)
             session = sess
             view?.attachSession(sess)
-            requestKeyboard()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start terminal", e)
         }
@@ -226,8 +242,58 @@ private class TerminalHolder(private val context: Context) {
         val v = view ?: return
         v.post {
             v.requestFocus()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val controller = v.windowInsetsController
+                if (controller != null) {
+                    controller.show(android.view.WindowInsets.Type.ime())
+                    return@post
+                }
+            }
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(v, InputMethodManager.SHOW_FORCED)
+            imm.showSoftInput(v, 0)
+        }
+    }
+
+    fun releaseFocus() {
+        view?.clearFocus()
+    }
+
+    fun copyToClipboard(text: String?) {
+        if (text.isNullOrEmpty()) return
+        runOnMain {
+            val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            cm.setPrimaryClip(ClipData.newPlainText("terminal", text))
+            Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun pasteClipboard() {
+        runOnMain {
+            val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = cm.primaryClip
+            if (clip == null || clip.itemCount == 0) {
+                Toast.makeText(context, "剪贴板为空", Toast.LENGTH_SHORT).show()
+                return@runOnMain
+            }
+            val text = clip.getItemAt(0).coerceToText(context).toString()
+            if (text.isEmpty()) {
+                Toast.makeText(context, "剪贴板为空", Toast.LENGTH_SHORT).show()
+                return@runOnMain
+            }
+            val emulator = session?.emulator
+            if (emulator != null) {
+                emulator.paste(text)
+            } else {
+                session?.write(text)
+            }
+        }
+    }
+
+    private fun runOnMain(block: () -> Unit) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            block()
+        } else {
+            mainHandler.post(block)
         }
     }
 

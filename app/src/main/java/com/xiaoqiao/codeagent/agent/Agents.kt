@@ -52,7 +52,7 @@ object Agents {
         id = "cursor",
         label = "Cursor Agent",
         probeCmd = listOf("cursor-agent", "--version"),
-        installCmd = "curl -fsS https://cursor.com/install | bash",
+        installCmd = "curl https://cursor.com/install -fsS | bash",
         buildArgv = { prompt, resume ->
             buildList {
                 addAll(listOf("cursor-agent", "-p", prompt, "--output-format", "stream-json", "--force"))

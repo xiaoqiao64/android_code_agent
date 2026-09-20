@@ -25,7 +25,7 @@ class AgentRunner(private val ctx: Context) {
     ): Flow<AgentEvent> = flow {
         val argv = agent.buildArgv(prompt, resume)
         emit(AgentEvent.Log("\$ ${argv.joinToString(" ")}"))
-        val pb = Proot.processBuilder(ctx, argv, cwd = cwd)
+        val pb = Proot.processBuilder(ctx, argv, cwd = cwd, wrapUserShell = true)
         val process = try {
             pb.start()
         } catch (e: Exception) {
@@ -57,7 +57,8 @@ class AgentRunner(private val ctx: Context) {
             }
             val code = process.waitFor()
             if (code != 0) {
-                emit(AgentEvent.Error("Agent exited with code $code"))
+                val hint = if (code == 127) " (command not found; is it on PATH / ~/.local/bin?)" else ""
+                emit(AgentEvent.Error("Agent exited with code $code$hint"))
                 emit(AgentEvent.Finished(false))
             } else {
                 emit(AgentEvent.Finished(true))
