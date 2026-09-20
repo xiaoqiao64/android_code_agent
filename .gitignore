@@ -1,34 +1,27 @@
-# Gradle files
+# Build / IDE
 .gradle/
 build/
-
-# Local configuration file (sdk path, etc)
+**/build/
 local.properties
-
-# Log/OS Files
-*.log
-
-# Android Studio generated files and folders
-captures/
-.externalNativeBuild/
-.cxx/
-*.aab
-*.apk
-output-metadata.json
-
-# IntelliJ
-*.iml
 .idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+*.iml
+.DS_Store
+captures/
+.cxx/
+.externalNativeBuild/
+.gradle-home/
 
-# Keystore files
+# Local toolchains (too large for git)
+.jdk-17/
+.android-ndk/
+.android-cmake/
+.native-build/
+tools/.native_tmp/
+
+# Prebuilt native payloads (regenerate via tools/fetch_native.py + tools/build_jni.sh)
+app/src/main/jniLibs/
+
+# Release signing
 *.jks
 *.keystore
-
-# Google Services (e.g. APIs or Firebase)
-google-services.json
-
-# Android Profiling
-*.hprof
+keystore.properties

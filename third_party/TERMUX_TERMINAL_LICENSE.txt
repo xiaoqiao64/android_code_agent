@@ -1,0 +1,3 @@
+terminal-emulator and terminal-view are from https://github.com/termux/termux-app
+and are released under the Apache License 2.0 (exception from the GPLv3 of termux-app).
+See https://github.com/termux/termux-app/blob/master/LICENSE.md
