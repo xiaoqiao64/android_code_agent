@@ -1,0 +1,59 @@
+app/src/main/AndroidManifest.xml
+  s_0f5eaf8946b3f3::t_02d486debda088 22
+app/src/main/java/com/xiaoqiao/codeagent/ui/shell/TerminalScreen.kt
+  s_0f5eaf8946b3f3::t_d96fccbe80f83b 6,19,25,40-42,44
+  s_0f5eaf8946b3f3::t_eedb7ed39d9443 212-217
+  s_0f5eaf8946b3f3::t_4b0527af9723a9 72
+  s_0f5eaf8946b3f3::t_0f77030c0aab9d 245-251,253,255-258
+  s_0f5eaf8946b3f3::t_49a6142eb69e49 254,259-262,268-270,295
+  s_0f5eaf8946b3f3::t_c03a000f8cd5e2 3-4,15
+  s_0f5eaf8946b3f3::t_a66c6e3733d2db 79
+  s_0f5eaf8946b3f3::t_53157e31a7c6a9 50
+  s_0f5eaf8946b3f3::t_2eec59267bb765 263-267,271-294,296
+  s_0f5eaf8946b3f3::t_53757513474ead 122
+  s_0f5eaf8946b3f3::t_5df0c4b1364cfd 143
+  s_0f5eaf8946b3f3::t_7f6268da767d05 181
+  s_0f5eaf8946b3f3::t_d1560b51457435 7-8
+  s_0f5eaf8946b3f3::t_0b80e441e858ae 61,66-67,73-78,80-82
+app/src/main/java/com/xiaoqiao/codeagent/agent/Agents.kt
+  h_7649dc09ebeed3 55
+app/src/main/java/com/xiaoqiao/codeagent/ui/chat/ChatScreen.kt
+  s_0f5eaf8946b3f3::t_1bf89ce81a7467 332-335
+  s_0f5eaf8946b3f3::t_a5c394e7513f6a 265-267
+  s_0f5eaf8946b3f3::t_68427d802d8c33 288-290
+  s_0f5eaf8946b3f3::t_b256091ae507ab 13-14,18,20,22
+app/src/main/java/com/xiaoqiao/codeagent/runtime/Proot.kt
+  s_0f5eaf8946b3f3::t_ef5bc524cc61c2 91-98,101-104
+  s_0f5eaf8946b3f3::t_befe2e0798b144 74-80
+  s_0f5eaf8946b3f3::t_c910545079fd0c 59-60,64
+  s_0f5eaf8946b3f3::t_2d0fb173c2c46d 21
+  s_0f5eaf8946b3f3::t_379e0fb634f543 99-100
+  s_0f5eaf8946b3f3::t_d607afe3cc55be 90
+app/src/main/java/com/xiaoqiao/codeagent/agent/AgentRunner.kt
+  s_0f5eaf8946b3f3::t_a10921868450fa 28
+  s_0f5eaf8946b3f3::t_14e68cf98c7613 60-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "aa9de52d62ac3560aefdf24b168ed6009c761746",
+  "prompts": {},
+  "logical_commit_id": "aa9de52d62ac3560aefdf24b168ed6009c761746",
+  "humans": {
+    "h_7649dc09ebeed3": {
+      "author": "xiaoqiao <xiaoqiao64@126.com>"
+    }
+  },
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 175,
+      "total_deletions": 57
+    }
+  }
+}
