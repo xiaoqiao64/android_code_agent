@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
+import android.os.Process
 import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.xiaoqiao.codeagent.agent.AgentForegroundService
 import com.xiaoqiao.codeagent.runtime.SshdInfo
 import com.xiaoqiao.codeagent.runtime.SshdServer
 
@@ -152,6 +154,13 @@ fun SshdDialog(onDismiss: () -> Unit) {
             }
         },
     )
+}
+
+fun exitApp(context: Context) {
+    SshdServer.stop(context)
+    AgentForegroundService.stopAll(context)
+    context.findActivity()?.finishAffinity()
+    Process.killProcess(Process.myPid())
 }
 
 private fun Context.findActivity(): Activity? {

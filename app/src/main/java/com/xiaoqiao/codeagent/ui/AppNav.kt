@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.xiaoqiao.codeagent.ui.chat.ChatScreen
+import com.xiaoqiao.codeagent.ui.files.FileBrowserScreen
 import com.xiaoqiao.codeagent.ui.setup.SetupScreen
 import com.xiaoqiao.codeagent.ui.shell.TerminalScreen
 import com.xiaoqiao.codeagent.ui.session.NewSessionScreen
@@ -17,6 +18,7 @@ object Routes {
     const val CHAT = "chat"
     const val NEW_SESSION = "new_session"
     const val TERMINAL = "terminal"
+    const val FILES = "files"
 }
 
 @Composable
@@ -40,6 +42,7 @@ fun AppNav(vm: AppViewModel = viewModel()) {
         composable(Routes.CHAT) {
             ChatScreen(
                 onOpenShell = { nav.navigate(Routes.TERMINAL) },
+                onOpenFiles = { nav.navigate(Routes.FILES) },
                 onNewSession = { nav.navigate(Routes.NEW_SESSION) },
             )
         }
@@ -55,6 +58,9 @@ fun AppNav(vm: AppViewModel = viewModel()) {
         }
         composable(Routes.TERMINAL) {
             TerminalScreen(onBack = { nav.popBackStack() })
+        }
+        composable(Routes.FILES) {
+            FileBrowserScreen(onBack = { nav.popBackStack() })
         }
     }
 }

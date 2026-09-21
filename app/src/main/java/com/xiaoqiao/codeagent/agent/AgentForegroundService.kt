@@ -142,5 +142,10 @@ class AgentForegroundService : Service() {
             val i = Intent(app, AgentForegroundService::class.java).setAction(ACTION_UPDATE)
             if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(i) else app.startService(i)
         }
+
+        fun stopAll(ctx: Context) {
+            synchronized(reasons) { reasons.clear() }
+            ctx.applicationContext.stopService(Intent(ctx.applicationContext, AgentForegroundService::class.java))
+        }
     }
 }
