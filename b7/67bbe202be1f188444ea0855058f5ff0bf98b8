@@ -1,0 +1,81 @@
+app/src/main/java/com/xiaoqiao/codeagent/runtime/WorkspaceFs.kt
+  s_7cc65e1306a79c::t_f833a91a0b05f1 1-32,34-37,45-89
+  s_7cc65e1306a79c::t_fb56c30de2e47c 33,38-44
+app/src/main/java/com/xiaoqiao/codeagent/agent/AgentForegroundService.kt
+  s_7cc65e1306a79c::t_2e89e12c7d8019 145-149
+app/src/main/AndroidManifest.xml
+  s_7cc65e1306a79c::t_597ac9446ad957 34-42
+app/src/main/java/com/xiaoqiao/codeagent/ui/files/FileBrowserScreen.kt
+  s_7cc65e1306a79c::t_a0b6733ccc9b32 290
+  s_7cc65e1306a79c::t_65061d64d3beec 4
+  s_7cc65e1306a79c::t_af0e4bcf05eaea 315-319
+  s_7cc65e1306a79c::t_d2b2475c84fbb8 313
+  s_7cc65e1306a79c::t_ff6aa4e2066e90 139,143-145,152,156-158
+  s_7cc65e1306a79c::t_3dc6a9fd81df41 211
+  s_7cc65e1306a79c::t_46a9c1eb9d980b 224
+  s_7cc65e1306a79c::t_b32bf74d1e2176 54
+  s_7cc65e1306a79c::t_328fe32c4f590f 89
+  s_7cc65e1306a79c::t_c5456b2a2042d6 264-265
+  s_7cc65e1306a79c::t_1e8192b50306a8 1-3,5-22,24-42,44-53,55-88,90-138,140-142,146-151,153-155,159-189,191-210,212-223,225-263,266-289,291-312,314,320-390
+  s_7cc65e1306a79c::t_84fc396e76d90e 23
+  s_7cc65e1306a79c::t_9822fb6404dd0c 43
+  s_7cc65e1306a79c::t_99c7d8cc5ea9e6 190
+app/src/main/java/com/xiaoqiao/codeagent/ui/ssh/SshdDialog.kt
+  s_7cc65e1306a79c::t_ca6b213c3715b0 10
+  s_7cc65e1306a79c::t_5289c4c3dd0e9b 45
+  s_7cc65e1306a79c::t_b87f4a5850ff88 159-163,165
+  s_7cc65e1306a79c::t_fb36e048c57331 157-158
+app/src/test/java/com/xiaoqiao/codeagent/runtime/WorkspaceFsTest.kt
+  s_7cc65e1306a79c::t_583250f55a2e87 70-71
+  s_7cc65e1306a79c::t_6685fc8399ce62 1-17,19-69,72-122
+  s_7cc65e1306a79c::t_70c8eb4ad9e1ad 18
+app/src/main/res/xml/file_paths.xml
+  s_7cc65e1306a79c::t_76f19ca48ec8a8 1-4
+app/src/main/java/com/xiaoqiao/codeagent/ui/chat/ChatScreen.kt
+  s_7cc65e1306a79c::t_e7fa5353c397ce 65
+  s_7cc65e1306a79c::t_7a40913648352e 474
+  s_7cc65e1306a79c::t_6c9819c2029c4d 30
+  s_7cc65e1306a79c::t_87c00837e3e46e 344
+  s_7cc65e1306a79c::t_c15deacfc22bf4 351
+  s_7cc65e1306a79c::t_02d819ab23023f 653-664
+  s_7cc65e1306a79c::t_02af9788653462 33
+  s_7cc65e1306a79c::t_d1f108e8cae197 355
+  s_7cc65e1306a79c::t_e0d996aa708ae3 36
+  s_7cc65e1306a79c::t_ff53cec3b18dfa 87
+  s_7cc65e1306a79c::t_d3fa65a8b9411a 465-467
+  s_7cc65e1306a79c::t_7e0fbb24b501bc 475-476
+  s_0f5eaf8946b3f3::t_24a9c6ddb3d5f0 652
+app/src/main/java/com/xiaoqiao/codeagent/ui/AppNav.kt
+  s_7cc65e1306a79c::t_461acb1f0fda6c 11
+  s_7cc65e1306a79c::t_cccd2467f74e3b 45
+  s_7cc65e1306a79c::t_38b4d8190f29de 62-63
+  s_7cc65e1306a79c::t_df09e2f421d855 21
+  s_7cc65e1306a79c::t_30b26d7cfafe32 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b767bbe202be1f188444ea0855058f5ff0bf98b8",
+  "prompts": {},
+  "logical_commit_id": "b767bbe202be1f188444ea0855058f5ff0bf98b8",
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>"
+    },
+    "s_7cc65e1306a79c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9f8edeb2-bac6-4057-a23f-cad48eda6b50",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 690,
+      "total_deletions": 29
+    }
+  }
+}
