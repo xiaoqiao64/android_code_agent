@@ -404,6 +404,11 @@ fun ChatScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.surface)
+                                .windowInsetsPadding(
+                                    WindowInsets.safeDrawing.only(
+                                        WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+                                    ),
+                                )
                                 .padding(start = 16.dp, end = 4.dp, top = 8.dp),
                         ) {
                             Row(
