@@ -43,6 +43,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +65,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xiaoqiao.codeagent.agent.AgentEvent
+import com.xiaoqiao.codeagent.agent.AgentRunConfig
+import com.xiaoqiao.codeagent.agent.ModelCatalog
+import com.xiaoqiao.codeagent.agent.ModelLister
 import com.xiaoqiao.codeagent.agent.AgentForegroundService
 import com.xiaoqiao.codeagent.agent.AgentRunner
 import com.xiaoqiao.codeagent.agent.Agents
@@ -85,16 +91,23 @@ data class ChatUiState(
     val streaming: String = "",
     val fileSuggestions: List<String> = emptyList(),
     val error: String? = null,
+    val catalog: ModelCatalog = ModelCatalog.EMPTY,
+    val catalogLoading: Boolean = false,
 )
 
 class ChatViewModel(app: Application) : AndroidViewModel(app) {
     private val store = SessionStore(app)
     private val runner = AgentRunner(app)
+    private val lister = ModelLister(app)
+    private val catalogCache = mutableMapOf<String, ModelCatalog>()
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch { reload() }
+        viewModelScope.launch {
+            reload()
+            _state.value.session?.agentId?.let { refreshCatalog(it) }
+        }
     }
 
     suspend fun reload() {
@@ -125,7 +138,62 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
     fun switchAgent(agentId: String) {
         val session = _state.value.session ?: return
         viewModelScope.launch {
-            val updated = session.copy(agentId = agentId, updatedAt = System.currentTimeMillis())
+            val updated = session.copy(
+                agentId = agentId,
+                modelId = null,
+                effort = null,
+                thinking = false,
+                fast = false,
+                updatedAt = System.currentTimeMillis(),
+            )
+            store.save(updated)
+            _state.update { it.copy(session = updated) }
+            refreshCatalog(agentId)
+        }
+    }
+
+    fun switchModel(modelId: String) {
+        val session = _state.value.session ?: return
+        viewModelScope.launch {
+            val updated = session.copy(
+                modelId = modelId,
+                effort = null,
+                thinking = false,
+                fast = false,
+                updatedAt = System.currentTimeMillis(),
+            )
+            store.save(updated)
+            _state.update { it.copy(session = updated) }
+        }
+    }
+
+    fun switchEffort(effort: String?) {
+        patchSession { it.copy(effort = effort?.ifBlank { null }) }
+    }
+
+    fun switchThinking(thinking: Boolean) {
+        patchSession { it.copy(thinking = thinking) }
+    }
+
+    fun switchFast(fast: Boolean) {
+        patchSession { it.copy(fast = fast) }
+    }
+
+    fun refreshCatalog(agentId: String) {
+        viewModelScope.launch {
+            catalogCache[agentId]?.let { cached ->
+                _state.update { it.copy(catalog = cached, catalogLoading = false) }
+            } ?: _state.update { it.copy(catalogLoading = true) }
+            val cat = runCatching { lister.list(Agents.byId(agentId)) }.getOrDefault(ModelCatalog.EMPTY)
+            catalogCache[agentId] = cat
+            _state.update { it.copy(catalog = cat, catalogLoading = false) }
+        }
+    }
+
+    private fun patchSession(block: (AgentSession) -> AgentSession) {
+        val session = _state.value.session ?: return
+        viewModelScope.launch {
+            val updated = block(session).copy(updatedAt = System.currentTimeMillis())
             store.save(updated)
             _state.update { it.copy(session = updated) }
         }
@@ -137,6 +205,7 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
             if (s != null) {
                 store.setActive(id)
                 _state.update { it.copy(session = s) }
+                refreshCatalog(s.agentId)
             }
         }
     }
@@ -173,21 +242,32 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
             val ctx = getApplication<Application>()
             AgentForegroundService.start(ctx)
             val agent = Agents.byId(current.agentId)
+            val cfg = runConfig(current, _state.value.catalog)
             val assistantBuf = StringBuilder()
             var resumeId = current.resumeId
             try {
-                runner.run(agent, prompt, current.workspace, resumeId).collect { ev ->
+                runner.run(agent, prompt, current.workspace, resumeId, cfg).collect { ev ->
                     when (ev) {
                         is AgentEvent.TextDelta -> {
                             assistantBuf.append(ev.text)
                             _state.update { it.copy(streaming = assistantBuf.toString()) }
                         }
                         is AgentEvent.AssistantMessage -> {
-                            assistantBuf.clear()
-                            assistantBuf.append(ev.text)
-                            _state.update { it.copy(streaming = assistantBuf.toString()) }
+                            if (assistantBuf.isEmpty()) {
+                                assistantBuf.append(ev.text)
+                                _state.update { it.copy(streaming = assistantBuf.toString()) }
+                            }
                         }
                         is AgentEvent.ToolCall -> {
+                            if (assistantBuf.isNotEmpty()) {
+                                val aMsg = ChatMessage(
+                                    UUID.randomUUID().toString(),
+                                    "assistant",
+                                    assistantBuf.toString(),
+                                )
+                                current = current.copy(messages = current.messages + aMsg)
+                                assistantBuf.clear()
+                            }
                             val toolMsg = ChatMessage(
                                 UUID.randomUUID().toString(),
                                 "tool",
@@ -195,7 +275,7 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
                                 toolName = ev.name,
                             )
                             current = current.copy(messages = current.messages + toolMsg)
-                            _state.update { it.copy(session = current) }
+                            _state.update { it.copy(session = current, streaming = "") }
                         }
                         is AgentEvent.SessionId -> resumeId = ev.id
                         is AgentEvent.Error -> _state.update { it.copy(error = ev.message) }
@@ -230,6 +310,22 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
             .map { it.relativeTo(host).path }
             .toList()
     }
+
+    private fun runConfig(session: AgentSession, catalog: ModelCatalog): AgentRunConfig {
+        val selected = catalog.find(session.modelId)
+        val slug = when {
+            selected == null -> session.modelId
+            selected.id.isEmpty() -> null
+            selected.effortViaFlag -> selected.id
+            else -> selected.resolve(session.effort, session.thinking, session.fast)
+        }
+        return AgentRunConfig(
+            model = slug,
+            effort = if (selected?.effortViaFlag == true) session.effort else null,
+            thinking = session.thinking,
+            fast = session.fast,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -243,7 +339,18 @@ fun ChatScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var agentMenu by remember { mutableStateOf(false) }
+    var modelMenu by remember { mutableStateOf(false) }
+    var effortMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
+    val selectedModel = state.catalog.find(state.session?.modelId)
+    val effortOptions = when {
+        selectedModel?.effortViaFlag == true -> state.catalog.flagEffortLevels
+        else -> selectedModel?.efforts.orEmpty()
+    }
+    val showEffort = selectedModel != null && selectedModel.id.isNotEmpty() &&
+        (selectedModel.showEffort || (selectedModel.effortViaFlag && effortOptions.isNotEmpty()))
+    val showThinking = selectedModel?.supportsThinking == true
+    val showFast = selectedModel?.supportsFast == true
 
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
@@ -362,6 +469,12 @@ fun ChatScreen(
                                             ChatMessage("streaming", "assistant", state.streaming),
                                         )
                                     }
+                                } else if (state.running) {
+                                    item {
+                                        MessageBubble(
+                                            ChatMessage("streaming", "assistant", "正在生成…"),
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -385,6 +498,82 @@ fun ChatScreen(
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
+                                .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box {
+                                TextButton(
+                                    onClick = { modelMenu = true },
+                                    enabled = state.session != null && !state.running,
+                                ) {
+                                    Text(
+                                        when {
+                                            state.catalogLoading && state.catalog.models.size <= 1 -> "加载模型…"
+                                            else -> state.catalog.label(state.session?.modelId)
+                                        },
+                                    )
+                                }
+                                DropdownMenu(expanded = modelMenu, onDismissRequest = { modelMenu = false }) {
+                                    state.catalog.models.forEach { model ->
+                                        DropdownMenuItem(
+                                            text = { Text(model.label) },
+                                            onClick = {
+                                                modelMenu = false
+                                                vm.switchModel(model.id)
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                            if (showEffort) {
+                                Box {
+                                    TextButton(
+                                        onClick = { effortMenu = true },
+                                        enabled = !state.running,
+                                    ) {
+                                        Text(state.session?.effort?.ifBlank { null } ?: "Effort")
+                                    }
+                                    DropdownMenu(expanded = effortMenu, onDismissRequest = { effortMenu = false }) {
+                                        DropdownMenuItem(
+                                            text = { Text("Default") },
+                                            onClick = {
+                                                effortMenu = false
+                                                vm.switchEffort(null)
+                                            },
+                                        )
+                                        effortOptions.forEach { level ->
+                                            DropdownMenuItem(
+                                                text = { Text(level) },
+                                                onClick = {
+                                                    effortMenu = false
+                                                    vm.switchEffort(level)
+                                                },
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            if (showThinking) {
+                                TextButton(
+                                    onClick = { vm.switchThinking(!(state.session?.thinking ?: false)) },
+                                    enabled = !state.running,
+                                ) {
+                                    Text(if (state.session?.thinking == true) "Thinking ✓" else "Thinking")
+                                }
+                            }
+                            if (showFast) {
+                                Text("Fast", style = MaterialTheme.typography.labelLarge)
+                                Switch(
+                                    checked = state.session?.fast == true,
+                                    onCheckedChange = { vm.switchFast(it) },
+                                    enabled = !state.running,
+                                )
                             }
                         }
                         Row(

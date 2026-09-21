@@ -11,7 +11,10 @@ data class AgentSpec(
     val label: String,
     val probeCmd: List<String>,
     val installCmd: String,
-    val buildArgv: (prompt: String, resume: String?) -> List<String>,
+    val listModelsCmds: List<List<String>>,
+    val effortViaFlag: Boolean = false,
+    val defaultEffortLevels: List<String> = emptyList(),
+    val buildArgv: (prompt: String, resume: String?, cfg: AgentRunConfig) -> List<String>,
     val parse: (JsonObject) -> List<AgentEvent>,
 )
 
@@ -21,9 +24,19 @@ object Agents {
         label = "Claude Code",
         probeCmd = listOf("claude", "--version"),
         installCmd = "npm install -g @anthropic-ai/claude-code",
-        buildArgv = { prompt, resume ->
+        listModelsCmds = listOf(
+            listOf("claude", "--help"),
+        ),
+        effortViaFlag = true,
+        defaultEffortLevels = listOf("low", "medium", "high", "xhigh", "max"),
+        buildArgv = { prompt, resume, cfg ->
             buildList {
                 addAll(listOf("claude", "-p", prompt, "--output-format", "stream-json", "--verbose", "--permission-mode", "bypassPermissions"))
+                addModel(cfg.model)
+                if (!cfg.effort.isNullOrBlank()) {
+                    add("--effort")
+                    add(cfg.effort)
+                }
                 if (!resume.isNullOrBlank()) {
                     add("--resume")
                     add(resume)
@@ -38,11 +51,25 @@ object Agents {
         label = "Codex",
         probeCmd = listOf("codex", "--version"),
         installCmd = "npm install -g @openai/codex",
-        buildArgv = { prompt, resume ->
-            if (!resume.isNullOrBlank()) {
-                listOf("codex", "exec", "resume", resume, "--json", "--dangerously-bypass-approvals-and-sandbox")
-            } else {
-                listOf("codex", "exec", "--json", "--dangerously-bypass-approvals-and-sandbox", prompt)
+        listModelsCmds = listOf(
+            listOf("codex", "debug", "models"),
+            listOf("codex", "--help"),
+        ),
+        effortViaFlag = true,
+        defaultEffortLevels = listOf("minimal", "low", "medium", "high", "xhigh"),
+        buildArgv = { prompt, resume, cfg ->
+            buildList {
+                if (!resume.isNullOrBlank()) {
+                    addAll(listOf("codex", "exec", "resume", resume, "--json", "--dangerously-bypass-approvals-and-sandbox"))
+                } else {
+                    addAll(listOf("codex", "exec", "--json", "--dangerously-bypass-approvals-and-sandbox"))
+                }
+                addModel(cfg.model)
+                if (!cfg.effort.isNullOrBlank()) {
+                    add("--config")
+                    add("model_reasoning_effort=${cfg.effort}")
+                }
+                if (resume.isNullOrBlank()) add(prompt)
             }
         },
         parse = ::parseCodex,
@@ -53,9 +80,26 @@ object Agents {
         label = "Cursor Agent",
         probeCmd = listOf("cursor-agent", "--version"),
         installCmd = "curl https://cursor.com/install -fsS | bash",
-        buildArgv = { prompt, resume ->
+        listModelsCmds = listOf(
+            listOf("cursor-agent", "--list-models", "--trust"),
+            listOf("cursor-agent", "models", "--trust"),
+            listOf("cursor-agent", "--help"),
+        ),
+        buildArgv = { prompt, resume, cfg ->
             buildList {
-                addAll(listOf("cursor-agent", "-p", prompt, "--output-format", "stream-json", "--force"))
+                addAll(
+                    listOf(
+                        "cursor-agent",
+                        "-p",
+                        prompt,
+                        "--output-format",
+                        "stream-json",
+                        "--stream-partial-output",
+                        "--force",
+                        "--trust",
+                    ),
+                )
+                addModel(cfg.model)
                 if (!resume.isNullOrBlank()) add("--resume=$resume")
             }
         },
@@ -67,9 +111,14 @@ object Agents {
         label = "GitHub Copilot",
         probeCmd = listOf("copilot", "--version"),
         installCmd = "npm install -g @github/copilot",
-        buildArgv = { prompt, resume ->
+        listModelsCmds = listOf(
+            listOf("copilot", "/model", "--list", "--json"),
+            listOf("copilot", "--help"),
+        ),
+        buildArgv = { prompt, resume, cfg ->
             buildList {
                 addAll(listOf("copilot", "-p", prompt, "--allow-all-tools", "--output-format=json"))
+                addModel(cfg.model)
                 if (!resume.isNullOrBlank()) add("--resume=$resume")
             }
         },
@@ -79,6 +128,13 @@ object Agents {
     val all: List<AgentSpec> = listOf(claude, codex, cursor, copilot)
 
     fun byId(id: String): AgentSpec = all.firstOrNull { it.id == id } ?: claude
+}
+
+private fun MutableList<String>.addModel(model: String?) {
+    if (!model.isNullOrBlank()) {
+        add("--model")
+        add(model)
+    }
 }
 
 private fun JsonObject.str(vararg keys: String): String? {
@@ -169,24 +225,35 @@ private fun parseCursor(obj: JsonObject): List<AgentEvent> {
             val hasTs = obj.containsKey("timestamp_ms")
             val hasMc = obj.containsKey("model_call_id")
             if (hasTs && !hasMc) texts.map { AgentEvent.TextDelta(it) }
-            else if (!hasTs && !hasMc) texts.map { AgentEvent.AssistantMessage(it) }
             else emptyList()
         }
         "tool_call" -> {
-            val tool = obj["tool_call"]?.jsonObject
-            listOf(AgentEvent.ToolCall("tool", tool?.toString() ?: "tool_call"))
+            if (obj.str("subtype") == "completed") emptyList()
+            else {
+                val tool = obj["tool_call"]?.jsonObject
+                listOf(AgentEvent.ToolCall("tool", cursorToolSummary(tool)))
+            }
         }
         "result" -> {
             val sid = obj.str("session_id")
             val result = obj.str("result").orEmpty()
             buildList {
                 if (sid != null) add(AgentEvent.SessionId(sid))
+                // Prefer streamed deltas; only use the terminal result if nothing was streamed.
                 if (result.isNotBlank()) add(AgentEvent.AssistantMessage(result))
                 add(AgentEvent.Finished(obj.str("subtype") != "error"))
             }
         }
         else -> emptyList()
     }
+}
+
+private fun cursorToolSummary(tool: JsonObject?): String {
+    if (tool == null) return "tool_call"
+    val name = tool.keys.firstOrNull() ?: return "tool_call"
+    val args = tool[name]?.jsonObject?.get("args")?.jsonObject
+    val path = args?.str("path", "command", "query")
+    return if (path.isNullOrBlank()) name else "$name $path"
 }
 
 private fun parseCopilot(obj: JsonObject): List<AgentEvent> {

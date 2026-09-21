@@ -60,13 +60,19 @@ class SessionStore(private val ctx: Context) {
         indexFile.writeText(json.encodeToString(next))
     }
 
-    suspend fun create(agentId: String, workspace: String, title: String? = null): AgentSession {
+    suspend fun create(
+        agentId: String,
+        workspace: String,
+        title: String? = null,
+        modelId: String? = null,
+    ): AgentSession {
         val id = UUID.randomUUID().toString()
         val session = AgentSession(
             id = id,
             title = title ?: workspace.substringAfterLast('/').ifBlank { "New session" },
             agentId = agentId,
             workspace = workspace,
+            modelId = modelId,
         )
         save(session)
         return session

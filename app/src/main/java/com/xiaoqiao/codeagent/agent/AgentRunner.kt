@@ -22,8 +22,9 @@ class AgentRunner(private val ctx: Context) {
         prompt: String,
         cwd: String,
         resume: String? = null,
+        cfg: AgentRunConfig = AgentRunConfig(),
     ): Flow<AgentEvent> = flow {
-        val argv = agent.buildArgv(prompt, resume)
+        val argv = agent.buildArgv(prompt, resume, cfg)
         emit(AgentEvent.Log("\$ ${argv.joinToString(" ")}"))
         val pb = Proot.processBuilder(ctx, argv, cwd = cwd, wrapUserShell = true)
         val process = try {

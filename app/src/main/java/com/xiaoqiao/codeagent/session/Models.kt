@@ -17,6 +17,10 @@ data class AgentSession(
     val title: String,
     val agentId: String,
     val workspace: String, // path inside debian, e.g. /root/workspace/foo
+    val modelId: String? = null,
+    val effort: String? = null,
+    val thinking: Boolean = false,
+    val fast: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val resumeId: String? = null,

@@ -59,6 +59,43 @@ class AgentParserTest {
     }
 
     @Test
+    fun cursorFinalFlushSkipped() {
+        val line = """{"type":"assistant","message":{"content":[{"type":"text","text":"dup"}]}}"""
+        val events = parse(Agents.cursor, line)
+        assertTrue(events.isEmpty())
+    }
+
+    @Test
+    fun cursorArgvStreamsPartialOutput() {
+        val argv = Agents.cursor.buildArgv("hi", null, AgentRunConfig())
+        assertTrue(argv.contains("--stream-partial-output"))
+        assertTrue(argv.contains("stream-json"))
+        assertTrue("--model" !in argv)
+    }
+
+    @Test
+    fun cursorArgvIncludesModel() {
+        val argv = Agents.cursor.buildArgv("hi", null, AgentRunConfig(model = "gpt-5.5"))
+        assertTrue(argv.contains("--model"))
+        assertTrue(argv.contains("gpt-5.5"))
+    }
+
+    @Test
+    fun claudeArgvIncludesEffort() {
+        val argv = Agents.claude.buildArgv("hi", null, AgentRunConfig(model = "sonnet", effort = "high"))
+        assertTrue(argv.contains("--effort"))
+        assertTrue(argv.contains("high"))
+        assertTrue(argv.contains("sonnet"))
+    }
+
+    @Test
+    fun cursorToolCallStarted() {
+        val line = """{"type":"tool_call","subtype":"started","tool_call":{"readToolCall":{"args":{"path":"README.md"}}}}"""
+        val events = parse(Agents.cursor, line)
+        assertEquals(listOf(AgentEvent.ToolCall("tool", "readToolCall README.md")), events)
+    }
+
+    @Test
     fun cursorResult() {
         val line = """{"type":"result","subtype":"success","result":"Final","session_id":"c1"}"""
         val events = parse(Agents.cursor, line)
