@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +34,7 @@ import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +43,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.foundation.horizontalScroll
@@ -59,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
@@ -76,6 +79,7 @@ import com.xiaoqiao.codeagent.session.AgentSession
 import com.xiaoqiao.codeagent.session.ChatMessage
 import com.xiaoqiao.codeagent.session.SessionStore
 import com.xiaoqiao.codeagent.session.SessionSummary
+import com.xiaoqiao.codeagent.ui.ssh.SshdButton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -396,17 +400,37 @@ fun ChatScreen(
                         WindowInsetsSides.Horizontal + WindowInsetsSides.Top,
                     ),
                     topBar = {
-                        TopAppBar(
-                            title = {
-                                Column {
-                                    Text(state.session?.title ?: "Code Agent")
-                                    Text(
-                                        state.session?.workspace ?: "No workspace",
-                                        style = MaterialTheme.typography.bodySmall,
-                                    )
-                                }
-                            },
-                            actions = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(start = 16.dp, end = 4.dp, top = 8.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    state.session?.title ?: "Code Agent",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f, fill = false),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    state.session?.workspace ?: "No workspace",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Box {
                                     TextButton(onClick = { agentMenu = true }) {
                                         Text(Agents.byId(state.session?.agentId ?: "claude").label)
@@ -423,14 +447,17 @@ fun ChatScreen(
                                         }
                                     }
                                 }
+                                Spacer(Modifier.weight(1f))
+                                SshdButton()
                                 IconButton(onClick = onOpenShell) {
                                     Icon(Icons.Default.Terminal, contentDescription = "Shell")
                                 }
                                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                     Icon(Icons.Default.History, contentDescription = "Sessions")
                                 }
-                            },
-                        )
+                            }
+                            HorizontalDivider()
+                        }
                     },
                 ) { padding ->
                     Column(

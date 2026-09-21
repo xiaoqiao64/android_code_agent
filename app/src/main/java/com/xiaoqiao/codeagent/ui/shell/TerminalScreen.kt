@@ -50,6 +50,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.delay
 import com.xiaoqiao.codeagent.runtime.Bootstrap
 import com.xiaoqiao.codeagent.runtime.Proot
+import com.xiaoqiao.codeagent.ui.ssh.SshdButton
 import com.termux.terminal.TerminalSession
 import com.termux.terminal.TerminalSessionClient
 import com.termux.view.TerminalView
@@ -93,6 +94,7 @@ fun TerminalScreen(onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                actions = { SshdButton() },
             )
         },
     ) { padding ->
