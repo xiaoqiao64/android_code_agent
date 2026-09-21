@@ -1,0 +1,28 @@
+app/src/main/AndroidManifest.xml
+  s_7cc65e1306a79c::t_d136ee2bc71ad7 15-16
+app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+  s_7cc65e1306a79c::t_0a2f98a15cf0dc 2-5
+app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+  s_7cc65e1306a79c::t_b5c3b91ed9b856 1-5
+app/src/main/res/values/colors.xml
+  s_7cc65e1306a79c::t_792687c0aa4ede 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f4c433a70874e2da743946c3bd56f956331915a3",
+  "prompts": {},
+  "logical_commit_id": "f4c433a70874e2da743946c3bd56f956331915a3",
+  "sessions": {
+    "s_7cc65e1306a79c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9f8edeb2-bac6-4057-a23f-cad48eda6b50",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 16,
+      "total_deletions": 14
+    }
+  }
+}
