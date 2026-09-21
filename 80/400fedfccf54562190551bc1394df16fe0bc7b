@@ -1,0 +1,22 @@
+app/src/main/java/com/xiaoqiao/codeagent/ui/chat/ChatScreen.kt
+  s_0f5eaf8946b3f3::t_5cd40cf91f6d50 407-411
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "80400fedfccf54562190551bc1394df16fe0bc7b",
+  "prompts": {},
+  "logical_commit_id": "80400fedfccf54562190551bc1394df16fe0bc7b",
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 699,
+      "total_deletions": 126
+    }
+  }
+}
