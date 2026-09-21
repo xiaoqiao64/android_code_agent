@@ -1,0 +1,40 @@
+app/src/main/java/com/xiaoqiao/codeagent/MainActivity.kt
+  s_0f5eaf8946b3f3::t_be0e9c1b57e78f 12,20-22
+app/src/main/java/com/xiaoqiao/codeagent/ui/shell/TerminalScreen.kt
+  s_0f5eaf8946b3f3::t_a9618b1e99dfea 53
+  s_0f5eaf8946b3f3::t_a833231488ac5c 97
+app/src/main/java/com/xiaoqiao/codeagent/agent/AgentForegroundService.kt
+  s_0f5eaf8946b3f3::t_bc3e697fbb796c 6,13-14,17-18,47,50-52,54-55,59-60,62,68,70,81-105,110,119-126,130,132,135-136,140
+  s_0f5eaf8946b3f3::t_8753bb00e82dbc 27-36,40-45,48-49,56,61,74-80,127-129,133-134,137,141-143
+  s_0f5eaf8946b3f3::t_22b5a7c8f6c18f 46
+  s_0f5eaf8946b3f3::t_7debb787d031c3 58
+app/src/main/java/com/xiaoqiao/codeagent/ui/chat/ChatScreen.kt
+  s_0f5eaf8946b3f3::t_f5e8b99ca7265f 451
+  s_0f5eaf8946b3f3::t_851c15f49b4a86 64
+  s_0f5eaf8946b3f3::t_43c00174fcf53e 37
+  s_0f5eaf8946b3f3::t_fbd81d3265e2ac 403-433,450,458-460
+  s_0f5eaf8946b3f3::t_04ccfe78eb8814 19,22
+  s_0f5eaf8946b3f3::t_040f70bc7f2ce3 82
+app/src/main/AndroidManifest.xml
+  s_0f5eaf8946b3f3::t_358cc8461938f7 8
+  s_0f5eaf8946b3f3::t_4f37922321b0ba 32-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5edfea6615bb2e684958c238a63320c8f8310a42",
+  "prompts": {},
+  "logical_commit_id": "5edfea6615bb2e684958c238a63320c8f8310a42",
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 694,
+      "total_deletions": 126
+    }
+  }
+}
