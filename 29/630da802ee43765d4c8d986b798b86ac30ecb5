@@ -1,0 +1,61 @@
+app/src/main/java/com/xiaoqiao/codeagent/agent/Agents.kt
+  s_0f5eaf8946b3f3::t_a4eca9a12e6fc8 27-28,30-32,35-39,54-56,58-60,66-70,83-86,88,99,102,114-116,118,121
+  s_0f5eaf8946b3f3::t_1f060cde3d4f60 14-17
+  s_0f5eaf8946b3f3::t_7d7ead821cc728 90-98,100-101
+  s_0f5eaf8946b3f3::t_04ad8236b571a5 242
+  s_0f5eaf8946b3f3::t_9969355ed6a471 29,57,61-65,71-72,87,117
+  s_0f5eaf8946b3f3::t_52235d3eb16ce3 231-233,235
+  s_0f5eaf8946b3f3::t_78ca0139aef57c 251-256,258
+  s_0f5eaf8946b3f3::t_e61fe323d2d5cc 234
+  s_0f5eaf8946b3f3::t_1e2df0559916e3 133-137,139
+  s_0f5eaf8946b3f3::t_c3660f695b88d0 131-132
+  s_0f5eaf8946b3f3::t_f76cae6690c425 249-250
+app/src/main/java/com/xiaoqiao/codeagent/ui/chat/ChatScreen.kt
+  s_0f5eaf8946b3f3::t_0e02cbea717ccc 312,343,345-353
+  s_0f5eaf8946b3f3::t_77921f318961aa 245,249
+  s_0f5eaf8946b3f3::t_a4e8cf42460bc6 470-471,500-501,506,515-519,523,533-567,569-576
+  s_0f5eaf8946b3f3::t_30d73bf921ff9a 208
+  s_0f5eaf8946b3f3::t_72a79a3de9dc9c 313-327
+  s_0f5eaf8946b3f3::t_fb3af21827c8b8 472-475
+  s_0f5eaf8946b3f3::t_8769b493eecf72 68-70
+  s_0f5eaf8946b3f3::t_0fdbf09e15fd56 139,141-142,147-150,152-157
+  s_0f5eaf8946b3f3::t_a0456873e79cc4 256-259
+  s_0f5eaf8946b3f3::t_f779c3ee327ba6 262-270,278
+  s_0f5eaf8946b3f3::t_a02aa393740786 507-514,521-522,524-532
+  s_0f5eaf8946b3f3::t_b6f50d511e7be2 140,143-146,151,158-193,196
+  s_0f5eaf8946b3f3::t_67b976b09980c9 46-48
+  s_0f5eaf8946b3f3::t_7f11d9a8e59e92 342
+  s_0f5eaf8946b3f3::t_17b3bc1b25e16d 94-95,101-102,107-110
+  s_0f5eaf8946b3f3::t_783179d2c4bfc6 499
+  s_0f5eaf8946b3f3::t_a1a60ed0a8bffb 502-505
+app/src/main/java/com/xiaoqiao/codeagent/session/Models.kt
+  s_0f5eaf8946b3f3::t_043f724f9f3b0b 20
+  s_0f5eaf8946b3f3::t_613e4d7cc05cc9 21-23
+app/src/test/java/com/xiaoqiao/codeagent/agent/AgentParserTest.kt
+  s_0f5eaf8946b3f3::t_86b9baacf52eb9 73-77,79-80
+  s_0f5eaf8946b3f3::t_524c167bd6c44f 70,78,81-88
+  s_0f5eaf8946b3f3::t_455a135df66558 62-69,71-72,89-98
+app/src/main/java/com/xiaoqiao/codeagent/session/SessionStore.kt
+  s_0f5eaf8946b3f3::t_c76da4d0515cf2 63-68,75
+app/src/main/java/com/xiaoqiao/codeagent/agent/AgentRunner.kt
+  s_0f5eaf8946b3f3::t_9da58976597fa3 25,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "29630da802ee43765d4c8d986b798b86ac30ecb5",
+  "prompts": {},
+  "logical_commit_id": "29630da802ee43765d4c8d986b798b86ac30ecb5",
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 775,
+      "total_deletions": 132
+    }
+  }
+}
