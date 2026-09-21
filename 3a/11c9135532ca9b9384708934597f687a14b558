@@ -1,0 +1,27 @@
+app/src/main/java/com/xiaoqiao/codeagent/agent/ModelLister.kt
+  s_0f5eaf8946b3f3::t_c4e1521058ca22 1-46
+app/src/main/java/com/xiaoqiao/codeagent/agent/ModelCatalog.kt
+  s_0f5eaf8946b3f3::t_16f69c67460fec 1-102,104-125,127-130,135-141,143-217
+  s_0f5eaf8946b3f3::t_18c52eb6fa3763 103,126,131-134,142
+app/src/test/java/com/xiaoqiao/codeagent/agent/ModelCatalogTest.kt
+  s_0f5eaf8946b3f3::t_a31629171bfba1 1-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3a11c9135532ca9b9384708934597f687a14b558",
+  "prompts": {},
+  "logical_commit_id": "3a11c9135532ca9b9384708934597f687a14b558",
+  "sessions": {
+    "s_0f5eaf8946b3f3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4d699033-c72b-4868-88c6-ff482e96c659",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 775,
+      "total_deletions": 132
+    }
+  }
+}
