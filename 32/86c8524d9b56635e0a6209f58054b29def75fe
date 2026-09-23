@@ -1,0 +1,50 @@
+app/src/main/java/com/xiaoqiao/codeagent/ui/chat/ChatScreen.kt
+  s_7cc65e1306a79c::t_fa3435b59f31c5 357
+  s_7cc65e1306a79c::t_a8ce79424db6e6 346
+  s_7cc65e1306a79c::t_256d309fa9c5c1 470-476
+  s_7cc65e1306a79c::t_4da4b3568089e4 671,674-686
+  s_7cc65e1306a79c::t_9ad9625f87d81b 672-673
+app/src/main/java/com/xiaoqiao/codeagent/ui/files/FileViewerScreen.kt
+  s_7cc65e1306a79c::t_b055a85c8d899e 35
+  s_7cc65e1306a79c::t_5c2329a25619e8 100-104
+  s_7cc65e1306a79c::t_b38edec0a9e7e7 182-186
+  s_7cc65e1306a79c::t_a5a195e340f4ed 207-219
+  s_7cc65e1306a79c::t_457a5aa36ae626 1-34,36-43,45-50,52-99,105-181,187-206,220-277
+  s_7cc65e1306a79c::t_fbe46a3b8553ee 44,51
+app/src/main/java/com/xiaoqiao/codeagent/ui/AppNav.kt
+  s_7cc65e1306a79c::t_d8feb22a6a891d 49
+  s_7cc65e1306a79c::t_0f3fa2a4bf42fb 35-38
+app/src/main/java/com/xiaoqiao/codeagent/runtime/RootfsInstaller.kt
+  s_7cc65e1306a79c::t_5310651b9985fc 35,37
+  s_7cc65e1306a79c::t_9fc2d0c278dda7 79
+app/src/main/java/com/xiaoqiao/codeagent/runtime/Bootstrap.kt
+  s_7cc65e1306a79c::t_89ba91543c1c15 23,25-33
+app/src/main/java/com/xiaoqiao/codeagent/ui/files/FileBrowserScreen.kt
+  s_7cc65e1306a79c::t_748552ea0245ad 73,132-163,165,218,234-239,247-256,322-328,346-359
+  s_7cc65e1306a79c::t_510c91e8f1ac98 360-361
+app/build.gradle.kts
+  s_7cc65e1306a79c::t_14b81c7b29f358 115-116
+app/src/main/java/com/xiaoqiao/codeagent/ui/files/FileKind.kt
+  s_7cc65e1306a79c::t_d6e3b979685c3d 1-74
+app/src/test/java/com/xiaoqiao/codeagent/ui/files/FileKindTest.kt
+  s_7cc65e1306a79c::t_be331516b6fab0 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3286c8524d9b56635e0a6209f58054b29def75fe",
+  "prompts": {},
+  "logical_commit_id": "3286c8524d9b56635e0a6209f58054b29def75fe",
+  "sessions": {
+    "s_7cc65e1306a79c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9f8edeb2-bac6-4057-a23f-cad48eda6b50",
+        "model": "grok-4.6"
+      },
+      "human_author": "xiaoqiao <xiaoqiao64@126.com>",
+      "total_additions": 522,
+      "total_deletions": 237
+    }
+  }
+}
