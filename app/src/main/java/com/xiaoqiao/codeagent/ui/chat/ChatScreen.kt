@@ -343,6 +343,7 @@ fun ChatScreen(
     onOpenShell: () -> Unit,
     onOpenFiles: () -> Unit,
     onNewSession: () -> Unit,
+    onReinitSetup: () -> Unit,
     vm: ChatViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsState()
@@ -353,6 +354,7 @@ fun ChatScreen(
     var modelMenu by remember { mutableStateOf(false) }
     var effortMenu by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
+    var confirmReinitShell by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val selectedModel = state.catalog.find(state.session?.modelId)
     val effortOptions = when {
@@ -465,7 +467,13 @@ fun ChatScreen(
                                 IconButton(onClick = onOpenFiles, enabled = state.session != null) {
                                     Icon(Icons.Default.Folder, contentDescription = "Files")
                                 }
-                                IconButton(onClick = onOpenShell) {
+                                IconButton(onClick = {
+                                    if (Bootstrap.isReady(context)) {
+                                        onOpenShell()
+                                    } else {
+                                        confirmReinitShell = true
+                                    }
+                                }) {
                                     Icon(Icons.Default.Terminal, contentDescription = "Shell")
                                 }
                                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
@@ -660,6 +668,22 @@ fun ChatScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmExit = false }) { Text("取消") }
+            },
+        )
+    }
+    if (confirmReinitShell) {
+        AlertDialog(
+            onDismissRequest = { confirmReinitShell = false },
+            title = { Text("Shell 环境不存在") },
+            text = { Text("Shell 环境不存在，是否重新初始化？") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmReinitShell = false
+                    onReinitSetup()
+                }) { Text("确定") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmReinitShell = false }) { Text("取消") }
             },
         )
     }

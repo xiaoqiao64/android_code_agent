@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,8 +62,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-private const val FILE_PROVIDER = "com.xiaoqiao.codeagent.fileprovider"
-
 data class FileBrowserState(
     val workspace: String? = null,
     val relative: String = ".",
@@ -73,6 +70,7 @@ data class FileBrowserState(
     val canGoUp: Boolean = false,
     val error: String? = null,
     val ready: Boolean = false,
+    val viewing: Viewing? = null,
 )
 
 class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
@@ -133,6 +131,38 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
         refresh()
     }
 
+    fun openInternal(entry: FsEntry) {
+        val root = rootOrNull() ?: return
+        val kind = FileKinds.of(entry.name)
+        if (!kind.internal) return
+        runCatching {
+            val file = WorkspaceFs.resolve(root, entry.relativePath)
+            _state.update { it.copy(viewing = Viewing(entry, file, kind), error = null) }
+        }.onFailure { err ->
+            _state.update { it.copy(error = err.message ?: "open failed") }
+        }
+    }
+
+    fun closeViewer() {
+        _state.update { it.copy(viewing = null) }
+    }
+
+    fun openExternal(entry: FsEntry): Intent? {
+        val ctx = getApplication<Application>()
+        val root = rootOrNull() ?: return null
+        return runCatching {
+            val src = WorkspaceFs.resolve(root, entry.relativePath)
+            val uri = FileProvider.getUriForFile(ctx, FILE_PROVIDER, src)
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, FileKinds.mimeOf(entry.name))
+                clipData = ClipData.newRawUri(entry.name, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+        }.onFailure { err ->
+            _state.update { it.copy(error = err.message ?: "open failed") }
+        }.getOrNull()
+    }
+
     fun rename(entry: FsEntry, newName: String) {
         viewModelScope.launch {
             val root = rootOrNull() ?: return@launch
@@ -185,7 +215,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
                 src.copyTo(dest, overwrite = true)
                 val uri = FileProvider.getUriForFile(ctx, FILE_PROVIDER, dest)
                 Intent(Intent.ACTION_SEND).apply {
-                    type = mimeOf(entry.name)
+                    type = FileKinds.mimeOf(entry.name)
                     putExtra(Intent.EXTRA_STREAM, uri)
                     clipData = ClipData.newRawUri(entry.name, uri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -197,16 +227,16 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
     }
 }
 
-fun mimeOf(name: String): String {
-    val ext = name.substringAfterLast('.', missingDelimiterValue = "").lowercase()
-    if (ext.isEmpty() || ext == name.lowercase()) return "application/octet-stream"
-    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FileBrowserScreen(onBack: () -> Unit, vm: FileBrowserViewModel = viewModel()) {
     val state by vm.state.collectAsState()
+    val viewing = state.viewing
+    if (viewing != null) {
+        FileViewerScreen(viewing, onBack = vm::closeViewer)
+        return
+    }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var menuFor by remember { mutableStateOf<FsEntry?>(null) }
@@ -214,6 +244,15 @@ fun FileBrowserScreen(onBack: () -> Unit, vm: FileBrowserViewModel = viewModel()
     var deleteFor by remember { mutableStateOf<FsEntry?>(null) }
     var pendingSave by remember { mutableStateOf<FsEntry?>(null) }
     var renameText by remember { mutableStateOf("") }
+
+    fun launchExternal(entry: FsEntry) {
+        val intent = vm.openExternal(entry) ?: return
+        try {
+            context.startActivity(Intent.createChooser(intent, "用其他应用打开"))
+        } catch (_: Exception) {
+            Toast.makeText(context, "没有可打开的应用", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val saveLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("*/*"),
@@ -280,7 +319,13 @@ fun FileBrowserScreen(onBack: () -> Unit, vm: FileBrowserViewModel = viewModel()
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .combinedClickable(
-                                            onClick = { if (entry.isDirectory) vm.enter(entry) },
+                                            onClick = {
+                                                when {
+                                                    entry.isDirectory -> vm.enter(entry)
+                                                    FileKinds.of(entry.name).internal -> vm.openInternal(entry)
+                                                    else -> launchExternal(entry)
+                                                }
+                                            },
                                             onLongClick = { menuFor = entry },
                                         )
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -298,6 +343,22 @@ fun FileBrowserScreen(onBack: () -> Unit, vm: FileBrowserViewModel = viewModel()
                                     onDismissRequest = { menuFor = null },
                                 ) {
                                     if (!entry.isDirectory) {
+                                        if (FileKinds.of(entry.name).internal) {
+                                            DropdownMenuItem(
+                                                text = { Text("打开") },
+                                                onClick = {
+                                                    menuFor = null
+                                                    vm.openInternal(entry)
+                                                },
+                                            )
+                                        }
+                                        DropdownMenuItem(
+                                            text = { Text("其他应用打开") },
+                                            onClick = {
+                                                menuFor = null
+                                                launchExternal(entry)
+                                            },
+                                        )
                                         DropdownMenuItem(
                                             text = { Text("保存") },
                                             onClick = {

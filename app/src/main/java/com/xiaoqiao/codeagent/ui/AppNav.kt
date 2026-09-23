@@ -32,8 +32,10 @@ fun AppNav(vm: AppViewModel = viewModel()) {
             SetupScreen(
                 onReady = {
                     vm.refreshReady()
-                    nav.navigate(Routes.CHAT) {
-                        popUpTo(Routes.SETUP) { inclusive = true }
+                    if (!nav.popBackStack(Routes.CHAT, inclusive = false)) {
+                        nav.navigate(Routes.CHAT) {
+                            popUpTo(Routes.SETUP) { inclusive = true }
+                        }
                     }
                 },
                 onOpenShell = { nav.navigate(Routes.TERMINAL) },
@@ -44,6 +46,7 @@ fun AppNav(vm: AppViewModel = viewModel()) {
                 onOpenShell = { nav.navigate(Routes.TERMINAL) },
                 onOpenFiles = { nav.navigate(Routes.FILES) },
                 onNewSession = { nav.navigate(Routes.NEW_SESSION) },
+                onReinitSetup = { nav.navigate(Routes.SETUP) },
             )
         }
         composable(Routes.NEW_SESSION) {

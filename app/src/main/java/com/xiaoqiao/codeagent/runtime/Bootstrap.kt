@@ -18,12 +18,19 @@ object Bootstrap {
 
     fun isReady(ctx: Context): Boolean {
         val boot = bootDir(ctx)
-        val debian = debianDir(ctx)
         return File(boot, MARKER).exists() &&
             File(boot, "proot").canExecute() &&
-            File(debian, "etc").isDirectory &&
-            (File(debian, "usr/bin/env").exists() || File(debian, "bin/bash").exists())
+            hasRootfs(debianDir(ctx))
     }
+
+    /** True only when the extracted Debian actually has a usable bash (not a stub). */
+    fun hasRootfs(debian: File): Boolean {
+        val bash = File(debian, "bin/bash").takeIf { usableBinary(it) }
+            ?: File(debian, "usr/bin/bash").takeIf { usableBinary(it) }
+        return File(debian, "etc").isDirectory && bash != null
+    }
+
+    private fun usableBinary(file: File): Boolean = file.exists() && file.length() > 1024L
 
     fun ensureBootstrap(ctx: Context) {
         val boot = bootDir(ctx)

@@ -32,12 +32,9 @@ object RootfsInstaller {
 
     data class Progress(val stage: String, val percent: Int, val detail: String = "")
 
-    fun isInstalled(ctx: Context): Boolean = looksLikeRootfs(Bootstrap.debianDir(ctx))
+    fun isInstalled(ctx: Context): Boolean = Bootstrap.hasRootfs(Bootstrap.debianDir(ctx))
 
-    private fun looksLikeRootfs(dir: File): Boolean {
-        return File(dir, "etc").isDirectory &&
-            (File(dir, "usr/bin/env").exists() || File(dir, "bin/bash").exists())
-    }
+    private fun looksLikeRootfs(dir: File): Boolean = Bootstrap.hasRootfs(dir)
 
     fun install(ctx: Context): Flow<Progress> = flow {
         Bootstrap.ensureBootstrap(ctx)
@@ -79,7 +76,7 @@ object RootfsInstaller {
 
         if (!looksLikeRootfs(debian)) {
             throw IllegalStateException(
-                "Rootfs extract did not produce /usr/bin/env or /bin/bash under ${debian.absolutePath}. " +
+                "Rootfs extract did not produce /bin/bash or /usr/bin/bash under ${debian.absolutePath}. " +
                     "Top entries: ${debian.list()?.take(12)?.joinToString()}",
             )
         }
